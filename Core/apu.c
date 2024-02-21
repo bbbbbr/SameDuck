@@ -826,7 +826,10 @@ void GB_apu_write(GB_gameboy_t *gb, uint8_t reg, uint8_t value)
             gb->apu.wave_channel.pulse_length = (0x100 - value);
             break;
         case GB_IO_NR32:
-            gb->apu.wave_channel.shift = (uint8_t[]){4, 0, 1, 2}[(value >> 5) & 3];
+            // Game Boy: Bits:6..5 : 00 = mute, 01 = 100%, 10 = 50%, 11 = 25%
+            // gb->apu.wave_channel.shift = (uint8_t[]){4, 0, 1, 2}[(value >> 5) & 3];
+            // Mega Duck: Bits:6..5 : 00 = mute, 01 = 25%, 10 = 50%, 11 = 100%
+            gb->apu.wave_channel.shift = (uint8_t[]){4, 2, 1, 0}[(value >> 5) & 3];
             if (gb->apu.is_active[GB_WAVE]) {
                 update_sample(gb, GB_WAVE, gb->apu.wave_channel.current_sample >> gb->apu.wave_channel.shift, 0);
             }
