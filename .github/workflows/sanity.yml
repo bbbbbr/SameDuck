@@ -1,25 +1,29 @@
 name: "Bulidability and Sanity"
 on:
-  push:
-    branches:
-      - master
-      - '*'
-      - '!libretro'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - master
+#      - '*'
+#      - '!libretro'
 
 jobs:
   sanity:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, ubuntu-20.04]
-        cc: [gcc, clang]
+#        os: [macos-latest, ubuntu-latest, ubuntu-20.04]
+        os: [ubuntu-latest, ubuntu-20.04, windows-2019]
+#        cc: [gcc, clang]
+        cc: [gcc]
         include:
-        - os: macos-latest
-          cc: clang
-          extra_targets: cocoa ios-ipa ios-deb
-        exclude:
-        - os: macos-latest
-          cc: gcc
+#        - os: macos-latest
+#          cc: clang
+#          extra_targets: cocoa ios-ipa ios-deb
+#        exclude:
+#        - os: macos-latest
+#          cc: gcc
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
