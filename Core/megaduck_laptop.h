@@ -41,6 +41,8 @@
 // #define DEBUG_LOG_DUCK_SERIAL_IO
 // #define DEBUG_LOG_DUCK_SERIAL_IO_BITS
 // #define DEBUG_LOG_DUCK_UNHANDLED_0x7FFF_POSSIBLE_BANK_WRITES
+// #define DEBUG_LOG_DUCK_SYSROM_MBC_WRITES
+// #define DEBUG_LOG_DUCK_SYSROM_SRAM_ACCESS
 
 #define MEGADUCK_BUF_SZ  256
 
@@ -158,7 +160,7 @@ enum {
     MEGADUCK_SYS_CMD_DONE_OR_OK               = 0x01,  // TODO: What does this do and why?
     MEGADUCK_SYS_CMD_DONE_OR_OK_AND_SOMETHING = 0x81,  // TODO: Seen this as a keyboard poll done reply instead of 0x01 by the calculator app, not sure what the difference is
     MEGADUCK_SYS_CMD_ABORT_OR_FAIL            = 0x04,  // TODO: What does this do and why?
-    MEGADUCK_SYS_CMD_PLAYSPEECH              = 0x05,  // Play pre-recorded speech samples (range 1-6, no audio enable required)
+    MEGADUCK_SYS_CMD_PLAYSPEECH               = 0x05,  // Play pre-recorded speech samples (range 1-6, no audio enable required). Playback of one sample can be interrupted by request for playback of another sample
     MEGADUCK_SYS_CMD_RUN_CART_IN_SLOT         = 0x08,  //
     MEGADUCK_SYS_CMD_INIT_UNKNOWN_0x09        = 0x09,  // May also be PrintScreen related
     MEGADUCK_SYS_CMD_RTC_SET_DATE_AND_TIME    = 0x0B,  // Sets Hardware RTC Date and Time using multi-byte buffer send/TX

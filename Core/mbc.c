@@ -36,7 +36,8 @@ const GB_cartridge_t GB_cart_defs[256] = {
     [0x22] =
     {  GB_MBC7  , true,  true,  false, false}, // 22h  MBC7+ACCEL+EEPROM
     [0xE0] =    // TODO: Does MegaDuck Laptop MBC have SRAM? Maybe only in Cart Slot form, but I don't have the cart
-    {  DUCK_SYSROM, false, false, false, false}, // E0h  MegaDuck Laptop System ROM MBC (32k bank size, reg addr 0x1000, range 0-15)
+    /* MBC        RAM    BAT.   RTC    RUMB.   */
+    {  DUCK_SYSROM, true, true, false, false},  // E0h  MegaDuck Laptop System ROM MBC (32k ROM bank size, reg addr 0x1000, range 0-15. 4 x 8k SRAM banks, shared bank reg with ROM banks)
     {  DUCK_MD1 , false, false, false, false},   // E1h  MegaDuck MD 1 (32K banks, reg addr 0xB000, range 0-1)
     {  DUCK_MD2 , false, false, false, false},   // E2h  MegaDuck MD 2 (16k banks, reg addr 0x0001, range 1-3 or 1-7)
     [0xFC] =
@@ -161,6 +162,7 @@ void GB_update_mbc_mappings(GB_gameboy_t *gb)
             //     gb->duck_sysrom.rom_bank, gb->mbc_rom0_bank, gb->mbc_rom_bank);
             gb->mbc_rom0_bank =  gb->duck_sysrom.rom_bank * 2;
             gb->mbc_rom_bank  = (gb->duck_sysrom.rom_bank * 2) + 1;
+            gb->mbc_ram_bank  = gb->duck_sysrom.ram_bank;
             // GB_log(gb, " -> 0: 0x%02x/ 1: 0x%02x]\n",
             //     gb->mbc_rom0_bank, gb->mbc_rom_bank);
             break;
@@ -238,10 +240,10 @@ void GB_configure_cart(GB_gameboy_t *gb)
     if (!gb->cartridge_type->has_ram &&
         gb->cartridge_type->mbc_type != GB_NO_MBC &&
         gb->cartridge_type->mbc_type != GB_TPP1 &&
-        // MegaDuck carts don't have SRAM
-        gb->cartridge_type->mbc_type != DUCK_SYSROM &&
+        // MegaDuck game carts don't have SRAM
         gb->cartridge_type->mbc_type != DUCK_MD1 &&
         gb->cartridge_type->mbc_type != DUCK_MD2 &&
+        // Megaduck laptop system ROM has plug in SRAM cart, treat is as plugged in // gb->cartridge_type->mbc_type != DUCK_SYSROM &&
 
         gb->rom[0x149]) {
         GB_log(gb, "ROM header reports no RAM, but also reports a non-zero RAM size. Assuming cartridge has RAM.\n");
@@ -262,6 +264,10 @@ void GB_configure_cart(GB_gameboy_t *gb)
             if (gb->rom[0x152] >= 1 && gb->rom[0x152] <= 9) {
                 gb->mbc_ram_size = 0x2000 << (gb->rom[0x152] - 1);
             }
+        }
+        else if (gb->cartridge_type->mbc_type == DUCK_SYSROM) {
+            // The System ROM seems to have 4 x 8k SRAM banks
+            gb->mbc_ram_size = 0x2000 * 4;
         }
         else {
             static const unsigned ram_sizes[256] = {0, 0x800, 0x2000, 0x8000, 0x20000, 0x10000};

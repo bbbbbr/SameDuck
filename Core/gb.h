@@ -644,6 +644,7 @@ struct GB_gameboy_internal_s {
             // MegaDuck
             struct {
                 uint8_t rom_bank;
+                uint8_t ram_bank;
             } duck_sysrom;  // MBC 0xE0
 
             struct {

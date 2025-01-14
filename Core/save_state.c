@@ -534,7 +534,10 @@ static int save_bess_mbc_block(GB_gameboy_t *gb, virtual_file_t *file)
 
         // MegaDuck
         case DUCK_SYSROM:
-            pairs[1] = (BESS_MBC_pair_t){LE16(0x1000), gb->duck_sysrom.rom_bank};
+            // Save/restore seems to revolve around replaying register writes(?)
+            // For the System ROM there is a shared MBC write address split between
+            // hi/lo nybbles for RAM / ROM bank address
+            pairs[1] = (BESS_MBC_pair_t){LE16(0x1000), gb->duck_sysrom.rom_bank | (gb->duck_sysrom.ram_bank << 4)};
             mbc_block.size = 1 * sizeof(pairs[0]);
             break;
         case DUCK_MD1:
